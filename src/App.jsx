@@ -1,16 +1,12 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
-import MyEditor from "./MyEditor";
+import EditorWithPreview from "./MyEditor";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <>
-      <MyEditor />
-    </>
+    <div className="bg-white">
+      <div className="min-h-screen max-w-screen-xl m-auto p">
+        <EditorWithPreview />
+      </div>
+    </div>
   );
 }
 

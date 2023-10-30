@@ -2,10 +2,13 @@ import { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
-import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { a11yDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 const EditorWithPreview = () => {
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(
+    `<p>asdffsafasfdasf</p><p>asdfafadsf</p><p>'a</p><p>sfa</p><p>fasdf</p><p>asf</p><pre class="ql-syntax" spellcheck="false">afsdfadsfasdfafasdfasdfasdfafd</pre><p>asdfa</p><h2>fasfdafdadffdaafddasf</h2><ol><li>adfaf</li></ol><p><br></p><ol><li>adfdadsfasfasfasf</li></ol>`
+  );
+  console.log(content);
 
   const handleEditorChange = (value) => {
     setContent(value);
@@ -14,6 +17,7 @@ const EditorWithPreview = () => {
   const toolbarOptions = [
     ["bold", "italic", "underline", "strike"], // toggled buttons
     ["blockquote", "code-block"],
+    ["image", "link"],
 
     [{ header: 1 }, { header: 2 }], // custom button values
     [{ list: "ordered" }, { list: "bullet" }],
@@ -35,26 +39,47 @@ const EditorWithPreview = () => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, "text/html");
     const nodes = Array.from(doc.body.childNodes);
-    const highlightedNodes = nodes.map((node, index) => {
-      if (node.nodeName === "PRE" && node.classList.contains("ql-syntax")) {
+
+    return nodes.map((node, index) => {
+      if (
+        (node.nodeName === "PRE" && node.classList.contains("ql-syntax")) ||
+        (node.nodeName === "CODE" &&
+          node.classList.contains("custom-code-class"))
+      ) {
         return (
-          <SyntaxHighlighter language="javascript" style={docco} key={index}>
+          <SyntaxHighlighter
+            language="javascript"
+            style={a11yDark}
+            wrapLines={true}
+            showLineNumbers={true}
+            key={index}
+          >
             {node.textContent}
           </SyntaxHighlighter>
         );
       } else {
         // Render other nodes as they are
+
         return (
-          <div key={index} dangerouslySetInnerHTML={{ __html: content }} />
+          <ReactQuill
+            key={index}
+            // dangerouslySetInnerHTML={{ __html: node.outerHTML }}
+            modules={{
+              toolbar: false,
+            }}
+            value={node.outerHTML}
+            readOnly={true}
+            style={{}}
+            theme=""
+            className="p-0 m-0 w-full border-none"
+          />
         );
       }
     });
-
-    return highlightedNodes;
   };
 
   return (
-    <div>
+    <div className="grid grid-cols-2 h-screen pt-10 gap-6">
       <div>
         <h2>Editor</h2>
         <ReactQuill
@@ -63,9 +88,10 @@ const EditorWithPreview = () => {
           }}
           value={content}
           onChange={handleEditorChange}
+          className="h-[calc(100%-10rem)]"
         />
       </div>
-      <div>
+      <div className="">
         <h2>Preview</h2>
         {renderPreview()}
       </div>
