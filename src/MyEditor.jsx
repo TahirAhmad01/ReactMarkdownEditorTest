@@ -3,13 +3,12 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import "highlight.js/styles/dracula.css"; // Include the highlight.js style
 
-const MyEditor = () => {
-  const [editorHtml, setEditorHtml] = useState("");
+const EditorWithPreview = () => {
+  const [content, setContent] = useState("");
 
-  const handleEditorChange = (html) => {
-    setEditorHtml(html);
+  const handleEditorChange = (value) => {
+    setContent(value);
   };
 
   const toolbarOptions = [
@@ -32,22 +31,46 @@ const MyEditor = () => {
     ["clean"], // remove formatting button
   ];
 
+  const renderPreview = () => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, "text/html");
+    const nodes = Array.from(doc.body.childNodes);
+    const highlightedNodes = nodes.map((node, index) => {
+      if (node.nodeName === "PRE" && node.classList.contains("ql-syntax")) {
+        return (
+          <SyntaxHighlighter language="javascript" style={docco} key={index}>
+            {node.textContent}
+          </SyntaxHighlighter>
+        );
+      } else {
+        // Render other nodes as they are
+        return (
+          <div key={index} dangerouslySetInnerHTML={{ __html: content }} />
+        );
+      }
+    });
+
+    return highlightedNodes;
+  };
+
   return (
     <div>
-      <h2>React Quill Editor</h2>
-      <ReactQuill
-        value={editorHtml}
-        onChange={handleEditorChange}
-        modules={{
-          toolbar: toolbarOptions,
-        }}
-      />
-      <h2>Highlighted Code</h2>
-      <SyntaxHighlighter language="javascript" style={docco}>
-        {editorHtml}
-      </SyntaxHighlighter>
+      <div>
+        <h2>Editor</h2>
+        <ReactQuill
+          modules={{
+            toolbar: toolbarOptions,
+          }}
+          value={content}
+          onChange={handleEditorChange}
+        />
+      </div>
+      <div>
+        <h2>Preview</h2>
+        {renderPreview()}
+      </div>
     </div>
   );
 };
 
-export default MyEditor;
+export default EditorWithPreview;
