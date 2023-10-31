@@ -5,9 +5,7 @@ import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import { a11yDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 const EditorWithPreview = () => {
-  const [content, setContent] = useState(
-    `<p>asdffsafasfdasf</p><p>asdfafadsf</p><p>'a</p><p>sfa</p><p>fasdf</p><p>asf</p><pre class="ql-syntax" spellcheck="false">afsdfadsfasdfafasdfasdfasdfafd</pre><p>asdfa</p><h2>fasfdafdadffdaafddasf</h2><ol><li>adfaf</li></ol><p><br></p><ol><li>adfdadsfasfasfasf</li></ol>`
-  );
+  const [content, setContent] = useState("");
   console.log(content);
 
   const handleEditorChange = (value) => {
@@ -47,15 +45,19 @@ const EditorWithPreview = () => {
           node.classList.contains("custom-code-class"))
       ) {
         return (
-          <SyntaxHighlighter
-            language="javascript"
-            style={a11yDark}
-            wrapLines={true}
-            showLineNumbers={true}
-            key={index}
-          >
-            {node.textContent}
-          </SyntaxHighlighter>
+          <div key={index} className="my-3">
+            <span className="text-xs font-bold text-gray-500">Code</span>
+            <SyntaxHighlighter
+              language="javascript"
+              style={a11yDark}
+              wrapLines={true}
+              showLineNumbers={true}
+              key={index}
+              className="rounded-md overflow-hidden"
+            >
+              {node.textContent}
+            </SyntaxHighlighter>
+          </div>
         );
       } else {
         // Render other nodes as they are
@@ -70,8 +72,7 @@ const EditorWithPreview = () => {
             value={node.outerHTML}
             readOnly={true}
             style={{}}
-            theme=""
-            className="p-0 m-0 w-full border-none"
+            theme="snow"
           />
         );
       }
@@ -93,7 +94,9 @@ const EditorWithPreview = () => {
       </div>
       <div className="">
         <h2>Preview</h2>
-        {renderPreview()}
+        <div className="border-2 rounded-md p-3 react-custom-quill">
+          {renderPreview()}
+        </div>
       </div>
     </div>
   );
